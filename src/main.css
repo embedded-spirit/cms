@@ -1,0 +1,113 @@
+/*
+  elm-hot creates an additional div wrapper around the app to make HMR possible.
+  This could break styling in development mode if you are using Elm UI.
+
+  More context in the issue:
+    https://github.com/halfzebra/create-elm-app/issues/320
+*/
+[data-elm-hot="true"] {
+  height: inherit;
+}
+
+body {
+  font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  text-align: center;
+  color: #293c4b;
+}
+
+.editor {
+    display: grid;
+    grid-template-columns: auto 400px 400px  auto;
+    grid-template-rows: 50px 50px 50px 50px 50px auto;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+
+    margin: 0 auto;
+    border: 1px solid red;
+    /* width: 300px; */
+    /* height: 450px; */
+}
+
+.top-left {
+    justify-self: right;
+}
+
+.top-mid {
+    grid-column: 2 / span 2;
+}
+
+.top-right {
+    justify-self: left;
+}
+
+.left-top-tool {
+    border: 1px solid lightBlue;
+    grid-column: 1 / span 1;
+    grid-row: 2 / span 2;
+    justify-self: right;
+}
+
+.left-mid-tool {
+    border: 1px solid lightBlue;
+    grid-column: 1 / 2;
+    grid-row: 4 / span 1;
+    justify-self: right;
+}
+
+.left-bottom-tool {
+    border: 1px solid lightBlue;
+    grid-column: 1 / 2;
+    grid-row: 5 / auto;
+    justify-self: right;
+}
+
+.device-header {
+    border: 1px solid lightBlue;
+    grid-column: 2 / span 1;
+    grid-row: 2 / span 1;
+}
+
+.device-page {
+    border: 1px solid lightBlue;
+    grid-column: 2 / span 1;
+    grid-row: 3 / span 3;
+}
+
+.layout-header {
+    border: 1px solid lightBlue;
+    grid-column: 3 / span 1;
+    grid-row: 2 / span 1;
+}
+
+.layout-page {
+    border: 1px solid lightBlue;
+    grid-column: 3 / span 1;
+    grid-row: 3 / span 3;
+}
+
+.right-top-tool {
+    border: 1px solid lightBlue;
+    grid-column: 4 / span 1;
+    grid-row: 2 / span 1;
+    justify-self: left;
+}
+
+.right-mid-tool {
+    border: 1px solid lightBlue;
+    grid-column: 4 / span 1;
+    grid-row: 3 / span 1;
+    justify-self: left;
+}
+
+.right-bottom-tool {
+    border: 1px solid lightBlue;
+    justify-self: left;
+    grid-column: 4 / span 1;
+}
+
+.tools-section-stacks {
+    display: flex;
+    justify-content: space-between;
+}
+
