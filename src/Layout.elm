@@ -1,54 +1,91 @@
 module Layout exposing
-    ( addWidgetButton
-    , showLayoutElement
+    ( leftPanel
+    , midPanel
+    , rightPanel
+    , toolBar
     )
 
 import Dict exposing (Dict, empty, fromList, get)
-import Html exposing (Html, div, h1, img, text)
-import Html.Attributes exposing (class, src)
-import Html.Events exposing (onClick)
+import Element exposing (..)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Events exposing (..)
+import Element.Font as Font
+import Element.Input as Input
 import Msg exposing (Msg(..))
-import Ntree exposing (Element(..), Nid, Ntree)
+import Ntree exposing (Nid, Ntree)
 
 
-addWidgetButton : Nid -> Html Msg
-addWidgetButton nid =
-    div
-        [ class "add-widget"
-        , onClick (AddWidget nid)
-        ]
-        [ text "(+)" ]
+mainColor =
+    rgb255 52 101 164
 
 
-showLayoutElement : Ntree -> Nid -> Html Msg
-showLayoutElement ntree nid =
+togglePanelButton : Bool -> Bool -> Element Msg
+togglePanelButton isLeft isOpen =
     let
-        x =
-            get nid ntree
+        align =
+            if isLeft then
+                alignLeft
+
+            else
+                alignRight
     in
-    case x of
-        Just node ->
-            let
-                log =
-                    Debug.log "showLayoutElement: " (Debug.toString node.branch)
-            in
-            case node.element of
-                StackViewWidget stackview ->
-                    div
-                        [ class "v-stack" ]
-                        (List.map
-                            (showLayoutElement ntree)
-                            node.branch
-                            ++ [ addWidgetButton node.nid ]
-                            ++ [ text log ]
-                        )
+    Input.button
+        [ padding 5
+        , align
+        ]
+        { onPress = Just <| ToggleSidePanel isLeft
+        , label = text "|||"
+        }
 
-                WidgetSelector ->
-                    div [ class "select-widget" ]
-                        [ text "SELECT WIDGET" ]
 
-                _ ->
-                    text "Error: element?"
+toolBar : Element Msg
+toolBar =
+    row
+        [ width fill
+        , paddingXY 10 10
+        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+        , Border.color mainColor
+        ]
+        [ togglePanelButton True True
+        , text
+            "Tool Bar"
+        , togglePanelButton False True
+        ]
 
-        Nothing ->
-            text "Error: cannot find root node"
+
+leftPanel : Int -> Element Msg
+leftPanel w =
+    column
+        [ height fill
+        , width (px w)
+        , alignLeft
+        , Border.widthEach { bottom = 0, top = 0, left = 0, right = 1 }
+
+        --, Background.color <| rgb255 92 99 118
+        --, Font.color <| rgb255 255 255 255
+        ]
+        [ text "Left Panel" ]
+
+
+midPanel : Element Msg
+midPanel =
+    column
+        [ height fill
+        , centerX
+        ]
+        [ text "Middle Panel" ]
+
+
+rightPanel : Int -> Element Msg
+rightPanel w =
+    column
+        [ height fill
+        , width (px w)
+        , alignRight
+        , Border.widthEach { bottom = 0, top = 0, left = 1, right = 0 }
+
+        --, Background.color <| rgb255 92 99 118
+        --, Font.color <| rgb255 255 255 255
+        ]
+        [ text "Right Panel" ]

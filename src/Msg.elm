@@ -4,4 +4,4 @@ import Ntree exposing (Nid)
 
 
 type Msg
-    = AddWidget Nid
+    = ToggleSidePanel Bool

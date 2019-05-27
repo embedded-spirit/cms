@@ -2,47 +2,73 @@ module Main exposing (main)
 
 import Browser
 import Dict exposing (Dict, empty, fromList, get)
-import Html exposing (Html, div, h1, img, text)
-import Html.Attributes exposing (class, src)
-import Html.Events exposing (onClick)
-import Layout exposing (showLayoutElement)
+import Element exposing (..)
+import Html
+import Json.Decode as Decode
+import Json.Decode.Pipeline exposing (..)
+import Layout exposing (..)
 import Msg exposing (Msg(..))
-import Ntree exposing (Branch, Dir(..), Element(..), Nid, Node, Ntree, addWidget, initialTree)
-import Random exposing (Seed, generate, initialSeed, int, step)
+import Ntree exposing (Branch, Nid, Node, Ntree)
+import Widgets.Collection exposing (..)
 
 
 
---type Seed = Seed Int Int
---type Generator a = Generator (Seed -> (a, Seed))
 ---- MODEL ----
 
 
+type alias Flags =
+    { ntree : String
+    , seed : Int
+    }
+
+
+type SidePanel
+    = SidePanel Bool Int
+
+
 type alias Model =
-    { currentSeed : Seed
+    { currentSeed : Int
+    , leftPanel : SidePanel
+    , rightPanel : SidePanel
     , ntree : Ntree
     }
 
 
-toNid : Int -> Nid
-toNid =
-    (++) "a" << String.fromInt
-
-
-getNid : Seed -> ( Nid, Seed )
-getNid =
-    Tuple.mapFirst toNid << step (int 1 1000)
-
-
-init : Int -> ( Model, Cmd Msg )
-init digit =
+initialTree : Int -> ( Ntree, Int )
+initialTree seed =
     let
-        seed =
-            initialSeed digit
+        nid =
+            "i" ++ String.fromInt seed
 
-        --( nid, newseed ) = getNid seed
+        nextSeed =
+            seed + 1
+    in
+    ( fromList [ ( nid, collection nid True ) ]
+    , nextSeed
+    )
+
+
+decodeNode : Decode.Decoder Node
+decodeNode =
+    Decode.succeed Node
+        |> required "nid" Decode.string
+        |> required "pid" (Decode.nullable Decode.string)
+        |> required "name" Decode.string
+        |> required "seetings" decodeSettings
+        |> required "style" decodeStyle
+        |> required "branch" (Decode.nullable decodeBranch)
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    let
+        ( ntree, seed ) =
+            initialTree flags.seed
     in
     ( { currentSeed = seed
-      , ntree = initialTree
+      , leftPanel = SidePanel True 300
+      , rightPanel = SidePanel True 300
+      , ntree = ntree
       }
     , Cmd.none
     )
@@ -55,47 +81,72 @@ init digit =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        AddWidget nid ->
-            ( { model | ntree = addWidget nid model.ntree }, Cmd.none )
+        ToggleSidePanel isLeft ->
+            let
+                model2 =
+                    if isLeft then
+                        case model.leftPanel of
+                            SidePanel True w ->
+                                { model | leftPanel = SidePanel False w }
+
+                            SidePanel False w ->
+                                { model | leftPanel = SidePanel True w }
+
+                    else
+                        case model.rightPanel of
+                            SidePanel True w ->
+                                { model | rightPanel = SidePanel False w }
+
+                            SidePanel False w ->
+                                { model | rightPanel = SidePanel True w }
+            in
+            ( model2, Cmd.none )
 
 
 
 ---- VIEW ----
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
-    div [ class "editor" ]
-        [ div [ class "top-left" ] [ text "top-left" ]
-        , div [ class "top-mid" ] [ text "top-mid" ]
-        , div [ class "top-right" ] [ text "top-right" ]
-        , div [ class "left-top-tool" ] [ text "left-top-tool" ]
-        , div [ class "left-mid-tool" ] [ text "left-mid-tool" ]
-        , div [ class "left-bottom-tool" ] [ text "left-bottom-tool" ]
-        , div [ class "device-header" ] [ text "device-header" ]
-        , div [ class "device-page" ]
-            [ text "device-page"
-            ]
-        , div [ class "layout-header" ] [ text "layout-header" ]
-        , div [ class "layout-page" ] [ showLayoutElement model.ntree "root" ]
-        , div [ class "right-top-tool" ]
-            [ div [ class "tools-section-stacks" ]
-                [ div [ class "v-stack" ] [ text "V-Stack" ]
-                , div [ class "h-stack" ] [ text "H-Stack" ]
+    { title = "Native CMS"
+    , body =
+        [ layout [] <|
+            let
+                leftP =
+                    case model.leftPanel of
+                        SidePanel True w ->
+                            [ leftPanel w ]
+
+                        SidePanel False _ ->
+                            []
+
+                rightP =
+                    case model.rightPanel of
+                        SidePanel True w ->
+                            [ rightPanel w ]
+
+                        SidePanel False _ ->
+                            []
+            in
+            column [ width fill, height fill ]
+                [ toolBar
+                , row [ height fill, width fill ] <|
+                    leftP
+                        ++ [ midPanel ]
+                        ++ rightP
                 ]
-            ]
-        , div [ class "right-mid-tool" ] [ text "right-mid-tool" ]
-        , div [ class "right-bottom-tool" ] [ text "righht-bottom-tool" ]
         ]
+    }
 
 
 
 ---- PROGRAM ----
 
 
-main : Program Int Model Msg
+main : Program Flags Model Msg
 main =
-    Browser.element
+    Browser.document
         { view = view
         , init = init
         , update = update
