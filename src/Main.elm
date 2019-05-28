@@ -8,7 +8,7 @@ import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (..)
 import Layout exposing (..)
 import Msg exposing (Msg(..))
-import Ntree exposing (Branch, Nid, Node, Ntree)
+import Ntree exposing (..)
 import Widgets.Collection exposing (..)
 
 
@@ -34,38 +34,13 @@ type alias Model =
     }
 
 
-initialTree : Int -> ( Ntree, Int )
-initialTree seed =
-    let
-        nid =
-            "i" ++ String.fromInt seed
-
-        nextSeed =
-            seed + 1
-    in
-    ( fromList [ ( nid, collection nid True ) ]
-    , nextSeed
-    )
-
-
-decodeNode : Decode.Decoder Node
-decodeNode =
-    Decode.succeed Node
-        |> required "nid" Decode.string
-        |> required "pid" (Decode.nullable Decode.string)
-        |> required "name" Decode.string
-        |> required "seetings" decodeSettings
-        |> required "style" decodeStyle
-        |> required "branch" (Decode.nullable decodeBranch)
-
-
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
-        ( ntree, seed ) =
-            initialTree flags.seed
+        ntree =
+            decodeNtree flags.ntree
     in
-    ( { currentSeed = seed
+    ( { currentSeed = flags.seed
       , leftPanel = SidePanel True 300
       , rightPanel = SidePanel True 300
       , ntree = ntree
