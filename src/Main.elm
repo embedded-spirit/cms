@@ -91,7 +91,7 @@ view model =
                 leftP =
                     case model.leftPanel of
                         SidePanel True w ->
-                            [ leftPanel w ]
+                            [ leftPanel w model.ntree ]
 
                         SidePanel False _ ->
                             []
@@ -99,17 +99,17 @@ view model =
                 rightP =
                     case model.rightPanel of
                         SidePanel True w ->
-                            [ rightPanel w ]
+                            [ rightPanel w model.ntree ]
 
                         SidePanel False _ ->
                             []
+
+                midP =
+                    [ midPanel model.ntree ]
             in
             column [ width fill, height fill ]
                 [ toolBar
-                , row [ height fill, width fill ] <|
-                    leftP
-                        ++ [ midPanel ]
-                        ++ rightP
+                , row [ height fill, width fill ] <| leftP ++ midP ++ rightP
                 ]
         ]
     }

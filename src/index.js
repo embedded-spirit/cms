@@ -4,25 +4,44 @@ import registerServiceWorker from './registerServiceWorker';
 
 let initialNtree = [
     {
+        nid: "root",
+        pid: null,
+        kind: {
+            name: "pages",
+            title: "Pages"
+        },
+        branch: [
+            {
+                nid: "1",
+                hidden: false,
+                link: false
+            }
+        ]
+    },
+    {
         nid: "1",
         pid: null,
-        name: "page",
-        settings: {
-            name: "page1"
+        kind: {
+            name: "page",
+            title: "page1",
+            style: { size: "full" }
         },
-        style: { size: "full" },
         branch: [
-            ["2", "visible", "direct"]
+            {
+                nid: "2",
+                hidden: false,
+                link: false
+            }
         ]
     },
     {
         nid: "2",
         pid: "1",
-        name: "collection",
-        settings: {
-            name: "Collection"
+        kind:{
+            name: "collection",
+            title: "Collection",
+            style: { dir: "vertical" },
         },
-        style: { dir: "vertical" },
         branch: null
     }
 

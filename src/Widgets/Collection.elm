@@ -8,8 +8,8 @@ collection : Nid -> Bool -> Node
 collection nid isVertical =
     { nid = nid
     , pid = Nothing
-    , name = "Collection"
-    , settings = fromList [ ( "title", StrProp "" ) ]
-    , style = fromList [ ( "isVertical", BoolProp isVertical ) ]
-    , branch = Nothing
+    , kind = KindCollection { title = "Collection" }
+
+    --, style = fromList [ ( "isVertical", BoolProp isVertical ) ]
+    --, branch = Nothing
     }

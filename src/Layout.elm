@@ -14,6 +14,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Msg exposing (Msg(..))
 import Ntree exposing (Nid, Ntree)
+import Views.TreeFolder exposing (..)
 
 
 mainColor =
@@ -54,8 +55,12 @@ toolBar =
         ]
 
 
-leftPanel : Int -> Element Msg
-leftPanel w =
+leftPanel : Int -> Ntree -> Element Msg
+leftPanel w ntree =
+    let
+        tfold =
+            treeFolder ntree
+    in
     column
         [ height fill
         , width (px w)
@@ -65,11 +70,11 @@ leftPanel w =
         --, Background.color <| rgb255 92 99 118
         --, Font.color <| rgb255 255 255 255
         ]
-        [ text "Left Panel" ]
+        [ tfold ]
 
 
-midPanel : Element Msg
-midPanel =
+midPanel : Ntree -> Element Msg
+midPanel ntree =
     column
         [ height fill
         , centerX
@@ -77,8 +82,8 @@ midPanel =
         [ text "Middle Panel" ]
 
 
-rightPanel : Int -> Element Msg
-rightPanel w =
+rightPanel : Int -> Ntree -> Element Msg
+rightPanel w ntree =
     column
         [ height fill
         , width (px w)
